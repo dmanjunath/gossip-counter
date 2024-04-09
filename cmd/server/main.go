@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"gossip-counter/gossip"
+	"gossip-counter/peers"
 	"gossip-counter/proto"
 	"log"
 	"net"
@@ -15,16 +16,8 @@ func main() {
 	flag.Int64Var(&nodeId, "nodeId", 1, "node id")
 	flag.Parse()
 
-	var port string
-	if nodeId == 1 {
-		port = ":50051"
-	} else if nodeId == 2 {
-		port = ":50052"
-	} else if nodeId == 3 {
-		port = ":50053"
-	} else {
-		log.Fatalf("invalid node id: %v", nodeId)
-	}
+	peers.VerifyPeerId(nodeId)
+	port := peers.PeerIds[nodeId]
 
 	lis, err := net.Listen("tcp", port)
 	if err != nil {
@@ -32,7 +25,7 @@ func main() {
 	}
 	grpcServer := grpc.NewServer()
 	proto.RegisterGossipServiceServer(grpcServer, &gossip.Server{
-		Peers: []string{":50051", ":50052", ":50053"},
+		Peers: peers.GetPeers(),
 	})
 	log.Printf("server listening at %v", lis.Addr())
 	if err := grpcServer.Serve(lis); err != nil {

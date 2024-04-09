@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"gossip-counter/peers"
 	"gossip-counter/proto"
 	"log"
 	"time"
@@ -13,12 +14,13 @@ import (
 )
 
 func main() {
-	var peer string
+	var nodeId int64
 	var action string
 	flag.StringVar(&action, "action", "increment", "action to perform")
-	flag.StringVar(&peer, "peer", "", "peer address in the format of host:port")
+	flag.Int64Var(&nodeId, "nodeId", 1, "node id")
 	flag.Parse()
 
+	peer := peers.GetPeerTarget(nodeId)
 	conn, err := grpc.NewClient(peer, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock())
 	if err != nil {
 		log.Fatalf("could not connect to %s: %v", peer, err)
