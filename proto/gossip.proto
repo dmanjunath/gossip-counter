@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "./proto";
+
+service GossipService {
+  rpc Increment (GossipMessage) returns (IncrementResponse) {}
+  rpc GetGossipCount (GossipMessage) returns (GetCountResponse) {}
+  // TODO add a method to to communicate with other nodes
+}
+
+message GossipMessage {}
+
+message IncrementResponse {
+  bool success = 1;
+}
+
+message GetCountResponse {
+  int64 count = 1;
+}
